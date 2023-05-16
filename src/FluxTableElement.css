@@ -1,0 +1,88 @@
+:host {
+    background-color: var(--flux-table-background-color);
+    display: block;
+    height: auto;
+    max-width: 100%;
+    width: 100%;
+}
+
+.actions {
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+    gap: 10px;
+    height: auto;
+    width: 100%;
+}
+
+.actions:empty {
+    display: none;
+}
+
+.actions:not(:empty) + table {
+    margin-top: 10px;
+}
+
+table {
+    height: auto;
+    width: 100%;
+}
+
+table, th, td {
+    border: 1px solid var(--flux-table-border-color);
+    border-collapse: collapse;
+}
+
+th, td {
+    height: auto;
+    padding: 10px;
+    text-align: left;
+    vertical-align: top;
+    width: auto;
+}
+
+th {
+    font-weight: bold;
+}
+
+thead tr {
+    background-color: var(--flux-table-header-row-background-color);
+    color: var(--flux-table-header-row-foreground-color);
+}
+
+tbody tr:nth-child(even) {
+    background-color: var(--flux-table-even-row-background-color);
+    color: var(--flux-table-even-row-foreground-color);
+}
+
+tbody tr:nth-child(odd) {
+    background-color: var(--flux-table-odd-row-background-color);
+    color: var(--flux-table-odd-row-foreground-color);
+}
+
+td[colspan] {
+    text-align: center;
+}
+
+.row_actions_cell {
+    width: 0;
+}
+
+.row_actions {
+    display: flex;
+    flex-direction: row;
+    flex-wrap: nowrap;
+    gap: 10px;
+    height: auto;
+    width: auto;
+}
+
+button {
+    cursor: default;
+    flex-grow: 0;
+    flex-shrink: 0;
+}
+
+button:not(:disabled) {
+    cursor: pointer;
+}

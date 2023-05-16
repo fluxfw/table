@@ -1,0 +1,10 @@
+:root {
+    --flux-table-background-color: var(--flux-color-scheme-background, #ffffff);
+    --flux-table-border-color: var(--flux-color-scheme-foreground, #000000);
+    --flux-table-even-row-background-color: var(--flux-color-scheme-background, #ffffff);
+    --flux-table-even-row-foreground-color: var(--flux-color-scheme-foreground, #000000);
+    --flux-table-header-row-background-color: rgba(var(--flux-color-scheme-accent-rgb, 0, 0, 0), 0.3);
+    --flux-table-header-row-foreground-color: var(--flux-color-scheme-foreground, #000000);
+    --flux-table-odd-row-background-color: var(--flux-color-scheme-background, #ffffff);
+    --flux-table-odd-row-foreground-color: var(--flux-color-scheme-foreground, #000000);
+}
