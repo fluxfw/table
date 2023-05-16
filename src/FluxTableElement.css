@@ -47,11 +47,12 @@ thead tr {
 }
 
 th {
+    border-right: none;
     font-weight: bold;
 }
 
-th:not(:last-child) {
-    border-right-color: var(--flux-table-header-row-border-color);
+th:not(:first-child) {
+    border-left-color: var(--flux-table-header-row-border-color);
 }
 
 tbody tr:nth-child(even) {
