@@ -28,7 +28,7 @@ table {
     width: 100%;
 }
 
-table, th, td {
+table, thead, tbody, tfoot, tr, th, td {
     border: 1px solid var(--flux-table-border-color);
     border-collapse: collapse;
 }
@@ -41,13 +41,17 @@ th, td {
     width: auto;
 }
 
+thead tr {
+    background-color: var(--flux-table-header-row-background-color);
+    color: var(--flux-table-header-row-foreground-color);
+}
+
 th {
     font-weight: bold;
 }
 
-thead tr {
-    background-color: var(--flux-table-header-row-background-color);
-    color: var(--flux-table-header-row-foreground-color);
+th:not(:last-child) {
+    border-right-color: var(--flux-table-header-row-border-color);
 }
 
 tbody tr:nth-child(even) {
@@ -55,9 +59,17 @@ tbody tr:nth-child(even) {
     color: var(--flux-table-even-row-foreground-color);
 }
 
+tr:nth-child(even) td:not(:last-child) {
+    border-right-color: var(--flux-table-even-row-border-color);
+}
+
 tbody tr:nth-child(odd) {
     background-color: var(--flux-table-odd-row-background-color);
     color: var(--flux-table-odd-row-foreground-color);
+}
+
+tr:nth-child(odd) td:not(:last-child) {
+    border-right-color: var(--flux-table-odd-row-border-color);
 }
 
 td[colspan] {
