@@ -41,7 +41,7 @@ th, td {
     width: auto;
 }
 
-thead tr {
+thead {
     background-color: var(--flux-table-header-row-background-color);
     color: var(--flux-table-header-row-foreground-color);
 }
