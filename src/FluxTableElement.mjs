@@ -21,7 +21,7 @@ export class FluxTableElement extends HTMLElement {
     /**
      * @type {string | null}
      */
-    #no_data_label;
+    #no_rows_label;
     /**
      * @type {ShadowRoot}
      */
@@ -33,17 +33,17 @@ export class FluxTableElement extends HTMLElement {
      * @param {string | null} id_key
      * @param {Action[] | null} actions
      * @param {string | null} actions_column_label
-     * @param {string | null} no_data_label
+     * @param {string | null} no_rows_label
      * @returns {FluxTableElement}
      */
-    static new(columns, rows, id_key = null, actions = null, actions_column_label = null, no_data_label = null) {
+    static new(columns, rows, id_key = null, actions = null, actions_column_label = null, no_rows_label = null) {
         return new this(
             columns,
             rows,
             id_key,
             actions ?? [],
             actions_column_label,
-            no_data_label
+            no_rows_label
         );
     }
 
@@ -53,10 +53,10 @@ export class FluxTableElement extends HTMLElement {
      * @param {string | null} id_key
      * @param {Action[]} actions
      * @param {string | null} actions_column_label
-     * @param {string | null} no_data_label
+     * @param {string | null} no_rows_label
      * @private
      */
-    constructor(columns, rows, id_key, actions, actions_column_label, no_data_label) {
+    constructor(columns, rows, id_key, actions, actions_column_label, no_rows_label) {
         super();
 
         this.#shadow = this.attachShadow({
@@ -158,7 +158,7 @@ export class FluxTableElement extends HTMLElement {
 
         this.#updateRowActions();
 
-        this.no_data_label = no_data_label;
+        this.no_rows_label = no_rows_label;
     }
 
     /**
@@ -177,7 +177,7 @@ export class FluxTableElement extends HTMLElement {
         row_element.remove();
 
         this.#updateRowActions();
-        this.#updateNoDataRow();
+        this.#updateNoRowsRow();
     }
 
     /**
@@ -219,18 +219,18 @@ export class FluxTableElement extends HTMLElement {
     /**
      * @returns {string | null}
      */
-    get no_data_label() {
-        return this.#no_data_label;
+    get no_rows_label() {
+        return this.#no_rows_label;
     }
 
     /**
-     * @param {string | null} no_data_label
+     * @param {string | null} no_rows_label
      * @returns {void}
      */
-    set no_data_label(no_data_label) {
-        this.#no_data_label = no_data_label;
+    set no_rows_label(no_rows_label) {
+        this.#no_rows_label = no_rows_label;
 
-        this.#updateNoDataRow();
+        this.#updateNoRowsRow();
     }
 
     /**
@@ -244,8 +244,8 @@ export class FluxTableElement extends HTMLElement {
     /**
      * @returns {void}
      */
-    #updateNoDataRow() {
-        this.#shadow.querySelectorAll("[data-no_data_row]").forEach(row_element => {
+    #updateNoRowsRow() {
+        this.#shadow.querySelectorAll("[data-no_rows_row]").forEach(row_element => {
             row_element.remove();
         });
 
@@ -256,11 +256,11 @@ export class FluxTableElement extends HTMLElement {
         }
 
         const row_element = document.createElement("tr");
-        row_element.dataset.no_data_row = true;
+        row_element.dataset.no_rows_row = true;
 
         const cell_element = document.createElement("td");
         cell_element.colSpan = this.#shadow.querySelectorAll("th").length;
-        cell_element.innerText = this.#no_data_label ?? "-";
+        cell_element.innerText = this.#no_rows_label ?? "-";
         row_element.appendChild(cell_element);
 
         body_element.appendChild(row_element);
