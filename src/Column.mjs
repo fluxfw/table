@@ -1,3 +1,3 @@
 /**
- * @typedef {{[key: string]: string}} Column
+ * @typedef {{key: string, label: string}} Column
  */
