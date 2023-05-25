@@ -86,7 +86,7 @@ tr td[colspan] {
     vertical-align: var(--flux-table-no-rows-row-vertical-align);
 }
 
-[data-column_key="actions"] {
+[data-column_format_type="flux-table-actions"] {
     width: 0;
 }
 

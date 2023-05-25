@@ -6,6 +6,12 @@ Changes:
 
 \-
 
+## v2023-05-25-1
+
+Changes:
+
+- `flux-format`
+
 ## v2023-05-23-1
 
 Changes:

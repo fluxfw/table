@@ -45,5 +45,5 @@
     --flux-table-odd-row-vertical-align: var(--flux-table-vertical-align);
     --flux-table-padding: 10px;
     --flux-table-text-align: start;
-    --flux-table-vertical-align: baseline;
+    --flux-table-vertical-align: top;
 }

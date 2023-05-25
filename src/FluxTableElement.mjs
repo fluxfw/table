@@ -1,11 +1,13 @@
-import { COLUMN_KEY_ACTIONS } from "./COLUMN_KEY.mjs";
-import { EMPTY_COLUMN } from "./EMPTY_COLUMN.mjs";
 import { flux_css_api } from "../../flux-css-api/src/FluxCssApi.mjs";
+import { FORMAT_TYPE_FLUX_TABLE_ACTIONS } from "./FORMAT_TYPE.mjs";
+import { FORMAT_TYPE_TEXT } from "../../flux-format/src/FORMAT_TYPE.mjs";
 import { ROW_ACTION_UPDATE_TYPE_DISABLE_ON_FIRST, ROW_ACTION_UPDATE_TYPE_DISABLE_ON_LAST } from "./ROW_ACTION_UPDATE_TYPE.mjs";
 
 /** @typedef {import("./Action.mjs").Action} Action */
 /** @typedef {import("./Column.mjs").Column} Column */
+/** @typedef {import("../../flux-format/src/FluxFormat.mjs").FluxFormat} FluxFormat */
 /** @typedef {import("./Row.mjs").Row} Row */
+/** @typedef {import("./RowAction.mjs").RowAction} RowAction */
 
 flux_css_api.adopt(
     document,
@@ -21,6 +23,10 @@ const css = await flux_css_api.import(
 
 export class FluxTableElement extends HTMLElement {
     /**
+     * @type {FluxFormat}
+     */
+    #flux_format;
+    /**
      * @type {string | null}
      */
     #no_rows_label;
@@ -34,33 +40,107 @@ export class FluxTableElement extends HTMLElement {
     #shadow;
 
     /**
+     * @param {FluxFormat} flux_format
+     * @returns {void}
+     */
+    static #addFormats(flux_format) {
+        flux_format.addFormat(
+            FORMAT_TYPE_FLUX_TABLE_ACTIONS,
+            /**
+             * @param {RowAction[] | null} actions
+             * @returns {Promise<HTMLDivElement | string>}
+             */
+            async (actions = null) => {
+                if ((actions ?? []).length > 0) {
+                    const actions_element = document.createElement("div");
+                    actions_element.classList.add("row_actions");
+
+                    for (const action of actions) {
+                        const button_element = document.createElement("button");
+                        if ((action["update-type"] ?? "") !== "") {
+                            button_element.dataset.row_action_update_type = action["update-type"];
+                        }
+                        button_element.innerText = action.label;
+                        if ((action.title ?? "") !== "") {
+                            button_element.title = action.title;
+                        }
+                        button_element.type = "button";
+                        button_element.addEventListener("click", () => {
+                            action.action();
+                        });
+                        actions_element.appendChild(button_element);
+                    }
+
+                    return actions_element;
+                } else {
+                    return flux_format.formatValue(
+                        null,
+                        FORMAT_TYPE_TEXT
+                    );
+                }
+            }
+        );
+    }
+
+    /**
+     * @param {FluxFormat} flux_format
      * @param {Action[] | null} actions
      * @param {Column[] | null} columns
      * @param {string | null} row_id_key
      * @param {Row[] | null} rows
      * @param {string | null} no_rows_label
+     * @returns {Promise<FluxTableElement>}
+     */
+    static async newWithData(flux_format, actions = null, columns = null, row_id_key = null, rows = null, no_rows_label = null) {
+        const flux_table_element = this.new(
+            flux_format,
+            actions ?? [],
+            row_id_key ?? ""
+        );
+
+        await flux_table_element.setColumns(
+            columns ?? [],
+            false
+        );
+        await flux_table_element.setRows(
+            rows ?? [],
+            false
+        );
+        await flux_table_element.setNoRowsLabel(
+            no_rows_label
+        );
+
+        return flux_table_element;
+    }
+
+    /**
+     * @param {FluxFormat} flux_format
+     * @param {Action[] | null} actions
+     * @param {string | null} row_id_key
      * @returns {FluxTableElement}
      */
-    static new(actions = null, columns = null, row_id_key = null, rows = null, no_rows_label = null) {
+    static new(flux_format, actions = null, row_id_key = null) {
         return new this(
+            flux_format,
             actions ?? [],
-            columns ?? [],
-            row_id_key ?? "",
-            rows ?? [],
-            no_rows_label
+            row_id_key ?? ""
         );
     }
 
     /**
+     * @param {FluxFormat} flux_format
      * @param {Action[]} actions
-     * @param {Column[]} columns
      * @param {string} row_id_key
-     * @param {Row[]} rows
-     * @param {string | null} no_rows_label
      * @private
      */
-    constructor(actions, columns, row_id_key, rows, no_rows_label) {
+    constructor(flux_format, actions, row_id_key) {
         super();
+
+        this.#flux_format = flux_format;
+
+        this.constructor.#addFormats(
+            flux_format
+        );
 
         this.#shadow = this.attachShadow({
             mode: "closed"
@@ -86,10 +166,7 @@ export class FluxTableElement extends HTMLElement {
         this.#shadow.appendChild(table_element);
 
         this.actions = actions;
-        this.columns = columns;
         this.row_id_key = row_id_key;
-        this.no_rows_label = no_rows_label;
-        this.rows = rows;
     }
 
     /**
@@ -118,20 +195,21 @@ export class FluxTableElement extends HTMLElement {
      * @param {string | null} before_key
      * @param {string | null} after_key
      * @param {boolean | null} update
-     * @returns {void}
+     * @returns {Promise<void>}
      */
-    addColumn(column, before_key = null, after_key = null, update = null) {
+    async addColumn(column, before_key = null, after_key = null, update = null) {
         if ((before_key !== null && after_key !== null) || before_key === column.key || after_key === column.key) {
             return;
         }
 
-        this.deleteColumn(
+        await this.deleteColumn(
             column.key,
             false
         );
 
         const column_element = document.createElement("th");
         column_element.dataset.column_key = column.key;
+        column_element.dataset.column_format_type = column["format-type"] ?? FORMAT_TYPE_TEXT;
         column_element.innerText = column.label;
 
         if (before_key !== null) {
@@ -161,7 +239,11 @@ export class FluxTableElement extends HTMLElement {
         for (const row_element of this.#getRowElements()) {
             const row_column_element = document.createElement("td");
             row_column_element.dataset.column_key = column.key;
-            row_column_element.innerText = EMPTY_COLUMN;
+            await this.#flux_format.formatValueToElement(
+                row_column_element,
+                null,
+                column_element.dataset.column_format_type
+            );
 
             if (before_key !== null) {
                 if (!this.#insertBeforeElement(
@@ -191,7 +273,7 @@ export class FluxTableElement extends HTMLElement {
         }
 
         if (update ?? true) {
-            this.update();
+            await this.update();
         }
     }
 
@@ -200,14 +282,14 @@ export class FluxTableElement extends HTMLElement {
      * @param {string | null} before_id
      * @param {string | null} after_id
      * @param {boolean | null} update
-     * @returns {void}
+     * @returns {Promise<void>}
      */
-    addRow(row, before_id = null, after_id = null, update = null) {
+    async addRow(row, before_id = null, after_id = null, update = null) {
         if ((before_id !== null && after_id !== null) || before_id === row[this.#row_id_key] || after_id === row[this.#row_id_key]) {
             return;
         }
 
-        this.deleteRow(
+        await this.deleteRow(
             row[this.#row_id_key],
             false
         );
@@ -221,34 +303,11 @@ export class FluxTableElement extends HTMLElement {
             const row_column_element = document.createElement("td");
             row_column_element.dataset.column_key = key;
 
-            if (key === COLUMN_KEY_ACTIONS) {
-                if ((row[key] ?? []).length > 0) {
-                    const actions_element = document.createElement("div");
-                    actions_element.classList.add("row_actions");
-
-                    for (const action of row[key]) {
-                        const button_element = document.createElement("button");
-                        if ((action["update-type"] ?? "") !== "") {
-                            button_element.dataset.row_action_update_type = action["update-type"];
-                        }
-                        button_element.innerText = action.label;
-                        if ((action.title ?? "") !== "") {
-                            button_element.title = action.title;
-                        }
-                        button_element.type = "button";
-                        button_element.addEventListener("click", () => {
-                            action.action();
-                        });
-                        actions_element.appendChild(button_element);
-                    }
-
-                    row_column_element.appendChild(actions_element);
-                } else {
-                    row_column_element.innerText = EMPTY_COLUMN;
-                }
-            } else {
-                row_column_element.innerText = row[key] ?? EMPTY_COLUMN;
-            }
+            await this.#flux_format.formatValueToElement(
+                row_column_element,
+                row[key] ?? null,
+                column_element.dataset.column_format_type
+            );
 
             row_element.appendChild(row_column_element);
         }
@@ -278,7 +337,7 @@ export class FluxTableElement extends HTMLElement {
         }
 
         if (update ?? true) {
-            this.update();
+            await this.update();
         }
     }
 
@@ -293,32 +352,11 @@ export class FluxTableElement extends HTMLElement {
     }
 
     /**
-     * @param {Column[]} columns
-     * @returns {void}
-     */
-    set columns(columns) {
-        this.rows = [];
-
-        this.#getHeaderRowElement().replaceChildren();
-
-        for (const column of columns) {
-            this.addColumn(
-                column,
-                null,
-                null,
-                false
-            );
-        }
-
-        this.update();
-    }
-
-    /**
      * @param {string} key
      * @param {boolean | null} update
-     * @returns {void}
+     * @returns {Promise<void>}
      */
-    deleteColumn(key, update = null) {
+    async deleteColumn(key, update = null) {
         this.#getColumnElements(
             false,
             key
@@ -327,16 +365,16 @@ export class FluxTableElement extends HTMLElement {
         });
 
         if (update ?? true) {
-            this.update();
+            await this.update();
         }
     }
 
     /**
      * @param {string} id
      * @param {boolean | null} update
-     * @returns {void}
+     * @returns {Promise<void>}
      */
-    deleteRow(id, update = null) {
+    async deleteRow(id, update = null) {
         const row_element = this.#getRowElement(
             id
         );
@@ -348,16 +386,16 @@ export class FluxTableElement extends HTMLElement {
         row_element.remove();
 
         if (update ?? true) {
-            this.update();
+            await this.update();
         }
     }
 
     /**
      * @param {string} key
      * @param {boolean | null} update
-     * @returns {void}
+     * @returns {Promise<void>}
      */
-    moveColumnLeft(key, update = null) {
+    async moveColumnLeft(key, update = null) {
         if (!this.#insertBeforePreviousElement(
             this.#getColumnElement(
                 key
@@ -378,16 +416,16 @@ export class FluxTableElement extends HTMLElement {
         }
 
         if (update ?? true) {
-            this.update();
+            await this.update();
         }
     }
 
     /**
      * @param {string} key
      * @param {boolean | null} update
-     * @returns {void}
+     * @returns {Promise<void>}
      */
-    moveColumnRight(key, update = null) {
+    async moveColumnRight(key, update = null) {
         if (!this.#insertAfterNextElement(
             this.#getColumnElement(
                 key
@@ -408,7 +446,7 @@ export class FluxTableElement extends HTMLElement {
         }
 
         if (update ?? true) {
-            this.update();
+            await this.update();
         }
     }
 
@@ -417,9 +455,9 @@ export class FluxTableElement extends HTMLElement {
      * @param {string | null} before_key
      * @param {string | null} after_key
      * @param {boolean | null} update
-     * @returns {void}
+     * @returns {Promise<void>}
      */
-    moveColumnTo(key, before_key = null, after_key = null, update = null) {
+    async moveColumnTo(key, before_key = null, after_key = null, update = null) {
         if ((before_key === null && after_key === null) || (before_key !== null && after_key !== null) || before_key === key || after_key === key) {
             return;
         }
@@ -479,16 +517,16 @@ export class FluxTableElement extends HTMLElement {
         }
 
         if (update ?? true) {
-            this.update();
+            await this.update();
         }
     }
 
     /**
      * @param {string} id
      * @param {boolean | null} update
-     * @returns {void}
+     * @returns {Promise<void>}
      */
-    moveRowDown(id, update = null) {
+    async moveRowDown(id, update = null) {
         if (!this.#insertAfterNextElement(
             this.#getRowElement(
                 id
@@ -498,7 +536,7 @@ export class FluxTableElement extends HTMLElement {
         }
 
         if (update ?? true) {
-            this.update();
+            await this.update();
         }
     }
 
@@ -507,9 +545,9 @@ export class FluxTableElement extends HTMLElement {
      * @param {string | null} before_id
      * @param {string | null} after_id
      * @param {boolean | null} update
-     * @returns {void}
+     * @returns {Promise<void>}
      */
-    moveRowTo(id, before_id = null, after_id = null, update = null) {
+    async moveRowTo(id, before_id = null, after_id = null, update = null) {
         if ((before_id === null && after_id === null) || (before_id !== null && after_id !== null) || before_id === id || after_id === id) {
             return;
         }
@@ -539,16 +577,16 @@ export class FluxTableElement extends HTMLElement {
         }
 
         if (update ?? true) {
-            this.update();
+            await this.update();
         }
     }
 
     /**
      * @param {string} id
      * @param {boolean | null} update
-     * @returns {void}
+     * @returns {Promise<void>}
      */
-    moveRowUp(id, update = null) {
+    async moveRowUp(id, update = null) {
         if (!this.#insertBeforePreviousElement(
             this.#getRowElement(
                 id
@@ -558,7 +596,7 @@ export class FluxTableElement extends HTMLElement {
         }
 
         if (update ?? true) {
-            this.update();
+            await this.update();
         }
     }
 
@@ -567,16 +605,6 @@ export class FluxTableElement extends HTMLElement {
      */
     get no_rows_label() {
         return this.#no_rows_label;
-    }
-
-    /**
-     * @param {string | null} no_rows_label
-     * @returns {void}
-     */
-    set no_rows_label(no_rows_label) {
-        this.#no_rows_label = no_rows_label;
-
-        this.update();
     }
 
     /**
@@ -604,16 +632,57 @@ export class FluxTableElement extends HTMLElement {
     }
 
     /**
-     * @param {Row[]} rows
-     * @returns {void}
+     * @param {Column[]} columns
+     * @param {boolean | null} update
+     * @returns {Promise<void>}
      */
-    set rows(rows) {
+    async setColumns(columns, update = null) {
+        await this.setRows(
+            [],
+            false
+        );
+
+        this.#getHeaderRowElement().replaceChildren();
+
+        for (const column of columns) {
+            await this.addColumn(
+                column,
+                null,
+                null,
+                false
+            );
+        }
+
+        if (update ?? true) {
+            await this.update();
+        }
+    }
+
+    /**
+     * @param {string | null} no_rows_label
+     * @param {boolean | null} update
+     * @returns {Promise<void>}
+     */
+    async setNoRowsLabel(no_rows_label, update = null) {
+        this.#no_rows_label = no_rows_label;
+
+        if (update ?? true) {
+            await this.update();
+        }
+    }
+
+    /**
+     * @param {Row[]} rows
+     * @param {boolean | null} update
+     * @returns {Promise<void>}
+     */
+    async setRows(rows, update = null) {
         this.#getRowElements().forEach(row_element => {
             row_element.remove();
         });
 
         for (const row of rows) {
-            this.addRow(
+            await this.addRow(
                 row,
                 null,
                 null,
@@ -621,14 +690,16 @@ export class FluxTableElement extends HTMLElement {
             );
         }
 
-        this.update();
+        if (update ?? true) {
+            await this.update();
+        }
     }
 
     /**
-     * @returns {void}
+     * @returns {Promise<void>}
      */
-    update() {
-        this.#updateNoRowsRow();
+    async update() {
+        await this.#updateNoRowsRow();
 
         this.#updateRowActions();
     }
@@ -733,9 +804,9 @@ export class FluxTableElement extends HTMLElement {
     }
 
     /**
-     * @returns {void}
+     * @returns {Promise<void>}
      */
-    #updateNoRowsRow() {
+    async #updateNoRowsRow() {
         const columns_count = this.#getColumnElements().length;
 
         if (this.#getRowElements().length > 0 || columns_count === 0) {
@@ -749,7 +820,11 @@ export class FluxTableElement extends HTMLElement {
 
         const row_column_element = row_element.querySelector("td") ?? document.createElement("td");
         row_column_element.colSpan = columns_count;
-        row_column_element.innerText = this.#no_rows_label ?? EMPTY_COLUMN;
+        await this.#flux_format.formatValueToElement(
+            row_column_element,
+            this.#no_rows_label,
+            FORMAT_TYPE_TEXT
+        );
 
         if (!row_column_element.isConnected) {
             row_element.appendChild(row_column_element);
