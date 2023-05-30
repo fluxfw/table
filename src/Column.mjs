@@ -1,3 +1,3 @@
 /**
- * @typedef {{key: string, label: string, "format-type"?: string}} Column
+ * @typedef {{key: string, label: string, "value-format-type"?: string}} Column
  */
