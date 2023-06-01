@@ -33,6 +33,11 @@ table, thead, tbody, tfoot, tr, th, td {
     border-collapse: collapse;
 }
 
+th, td {
+    --flux-table-column-width: auto;
+    width: var(--flux-table-column-width);
+}
+
 th {
     background-color: var(--flux-table-header-row-background-color);
     border-right: none;
@@ -84,10 +89,7 @@ tr td[colspan] {
     padding: var(--flux-table-no-rows-row-padding);
     text-align: var(--flux-table-no-rows-row-text-align);
     vertical-align: var(--flux-table-no-rows-row-vertical-align);
-}
-
-[data-column_value_format_type="flux-table-actions"] {
-    width: 0;
+    width: auto;
 }
 
 .row_actions {

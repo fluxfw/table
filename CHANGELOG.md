@@ -6,6 +6,14 @@ Changes:
 
 \-
 
+## v2023-06-01-1
+
+Changes:
+
+- Remove and optional `flux-value-format` / Include `formatValueToElement`
+- Column widths
+- `Node` row values
+
 ## v2023-05-30-1
 
 Changes:
