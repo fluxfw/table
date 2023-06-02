@@ -6,23 +6,6 @@
     width: 100%;
 }
 
-.actions {
-    display: flex;
-    flex-direction: row;
-    flex-wrap: wrap;
-    gap: 10px;
-    height: auto;
-    width: 100%;
-}
-
-.actions:empty {
-    display: none;
-}
-
-.actions:not(:empty) + table {
-    margin-top: 10px;
-}
-
 table {
     height: auto;
     width: 100%;
@@ -90,21 +73,4 @@ tr td[colspan] {
     text-align: var(--flux-table-no-rows-row-text-align);
     vertical-align: var(--flux-table-no-rows-row-vertical-align);
     width: auto;
-}
-
-.row_actions {
-    display: flex;
-    flex-direction: row;
-    flex-wrap: nowrap;
-    gap: 10px;
-}
-
-button {
-    cursor: default;
-    flex-grow: 0;
-    flex-shrink: 0;
-}
-
-button:not(:disabled) {
-    cursor: pointer;
 }

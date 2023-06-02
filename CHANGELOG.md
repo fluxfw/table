@@ -6,6 +6,13 @@ Changes:
 
 \-
 
+## v2023-06-02-1
+
+Changes:
+
+- Update row callback
+- Remove actions and row actions
+
 ## v2023-06-01-1
 
 Changes:
