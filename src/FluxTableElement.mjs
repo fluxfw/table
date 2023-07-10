@@ -5,11 +5,11 @@ import { flux_css_api } from "../../flux-css-api/src/FluxCssApi.mjs";
 /** @typedef {import("./Row.mjs").Row} Row */
 /** @typedef {import("./updateRow.mjs").updateRow} updateRow */
 
-const variables_css = await flux_css_api.import(
-    `${import.meta.url.substring(0, import.meta.url.lastIndexOf("/"))}/FluxTableElementVariables.css`
+const root_css = await flux_css_api.import(
+    `${import.meta.url.substring(0, import.meta.url.lastIndexOf("/"))}/FluxTableElementRoot.css`
 );
 
-document.adoptedStyleSheets.unshift(variables_css);
+document.adoptedStyleSheets.unshift(root_css);
 
 const css = await flux_css_api.import(
     `${import.meta.url.substring(0, import.meta.url.lastIndexOf("/"))}/FluxTableElement.css`
@@ -116,12 +116,12 @@ export class FluxTableElement extends HTMLElement {
         const table_element = document.createElement("table");
 
         const header_element = document.createElement("thead");
-        header_element.appendChild(document.createElement("tr"));
-        table_element.appendChild(header_element);
+        header_element.append(document.createElement("tr"));
+        table_element.append(header_element);
 
-        table_element.appendChild(document.createElement("tbody"));
+        table_element.append(document.createElement("tbody"));
 
-        this.#shadow.appendChild(table_element);
+        this.#shadow.append(table_element);
 
         this.row_id_key = row_id_key;
     }
@@ -178,7 +178,7 @@ export class FluxTableElement extends HTMLElement {
                     return;
                 }
             } else {
-                this.#getHeaderRowElement().appendChild(column_element);
+                this.#getHeaderRowElement().append(column_element);
             }
         }
 
@@ -215,7 +215,7 @@ export class FluxTableElement extends HTMLElement {
                         continue;
                     }
                 } else {
-                    row_element.appendChild(row_column_element);
+                    row_element.append(row_column_element);
                 }
             }
         }
@@ -261,7 +261,7 @@ export class FluxTableElement extends HTMLElement {
                 key
             );
 
-            row_element.appendChild(row_column_element);
+            row_element.append(row_column_element);
         }
 
         if (before_id !== null) {
@@ -284,7 +284,7 @@ export class FluxTableElement extends HTMLElement {
                     return;
                 }
             } else {
-                this.#getBodyElement().appendChild(row_element);
+                this.#getBodyElement().append(row_element);
             }
         }
 
@@ -688,7 +688,7 @@ export class FluxTableElement extends HTMLElement {
 
         if (formatted_value instanceof Node) {
             element.dataset.row_column_has_node_value = true;
-            element.appendChild(formatted_value);
+            element.append(formatted_value);
         } else {
             delete element.dataset.row_column_has_node_value;
             element.innerText = formatted_value;
@@ -817,12 +817,12 @@ export class FluxTableElement extends HTMLElement {
         );
 
         if (!row_column_element.isConnected) {
-            row_element.appendChild(row_column_element);
+            row_element.append(row_column_element);
         }
 
         if (!row_element.isConnected) {
             row_element.dataset.no_rows_row = true;
-            this.#getBodyElement().appendChild(row_element);
+            this.#getBodyElement().append(row_element);
         }
     }
 
