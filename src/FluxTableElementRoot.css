@@ -1,6 +1,6 @@
-:root {
-    --flux-table-background-color: var(--flux-color-scheme-background-color, #ffffff);
-    --flux-table-border-color: var(--flux-color-scheme-foreground-color, #000000);
+:root, :host {
+    --flux-table-background-color: #ffffff;
+    --flux-table-border-color: #000000;
     --flux-table-border-style: solid;
     --flux-table-border-width: 1px;
     --flux-table-even-row-background-color: var(--flux-table-background-color);
@@ -15,14 +15,14 @@
     --flux-table-even-row-vertical-align: var(--flux-table-vertical-align);
     --flux-table-font-size: 16px;
     --flux-table-font-weight: normal;
-    --flux-table-foreground-color: var(--flux-color-scheme-foreground-color, #000000);
-    --flux-table-header-row-background-color: var(--flux-color-scheme-accent-color, #000000);
-    --flux-table-header-row-border-color: var(--flux-color-scheme-accent-color-foreground-color, #ffffff);
+    --flux-table-foreground-color: #000000;
+    --flux-table-header-row-background-color: #000000;
+    --flux-table-header-row-border-color: #ffffff;
     --flux-table-header-row-border-style: var(--flux-table-border-style);
     --flux-table-header-row-border-width: var(--flux-table-border-width);
     --flux-table-header-row-font-size: var(--flux-table-font-size);
     --flux-table-header-row-font-weight: bold;
-    --flux-table-header-row-foreground-color: var(--flux-color-scheme-accent-color-foreground-color, #ffffff);
+    --flux-table-header-row-foreground-color: #ffffff;
     --flux-table-header-row-padding: var(--flux-table-padding);
     --flux-table-header-row-text-align: var(--flux-table-text-align);
     --flux-table-header-row-vertical-align: var(--flux-table-vertical-align);

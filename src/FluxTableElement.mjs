@@ -1,19 +1,20 @@
-import { flux_css_api } from "../../flux-css-api/src/FluxCssApi.mjs";
+import { flux_import_css } from "../../flux-style-sheet-manager/src/FluxImportCss.mjs";
 
 /** @typedef {import("./Column.mjs").Column} Column */
 /** @typedef {import("./formatValue.mjs").formatValue} formatValue */
 /** @typedef {import("./Row.mjs").Row} Row */
+/** @typedef {import("./StyleSheetManager/StyleSheetManager.mjs").StyleSheetManager} StyleSheetManager */
 /** @typedef {import("./updateRow.mjs").updateRow} updateRow */
 
-const root_css = await flux_css_api.import(
+const root_css = await flux_import_css.import(
     `${import.meta.url.substring(0, import.meta.url.lastIndexOf("/"))}/FluxTableElementRoot.css`
 );
 
-document.adoptedStyleSheets.unshift(root_css);
-
-const css = await flux_css_api.import(
+const css = await flux_import_css.import(
     `${import.meta.url.substring(0, import.meta.url.lastIndexOf("/"))}/FluxTableElement.css`
 );
+
+export const FLUX_TABLE_ELEMENT_VARIABLE_PREFIX = "--flux-table-";
 
 export class FluxTableElement extends HTMLElement {
     /**
@@ -48,13 +49,15 @@ export class FluxTableElement extends HTMLElement {
      * @param {formatValue | null} format_value
      * @param {updateRow | null} update_row
      * @param {string | null} no_rows_label
+     * @param {StyleSheetManager | null} style_sheet_manager
      * @returns {Promise<FluxTableElement>}
      */
-    static async newWithData(columns = null, row_id_key = null, rows = null, format_value = null, update_row = null, no_rows_label = null) {
-        const flux_table_element = this.new(
+    static async newWithData(columns = null, row_id_key = null, rows = null, format_value = null, update_row = null, no_rows_label = null, style_sheet_manager = null) {
+        const flux_table_element = await this.new(
             format_value,
             update_row,
-            row_id_key ?? ""
+            row_id_key ?? "",
+            style_sheet_manager
         );
 
         await flux_table_element.setColumns(
@@ -76,9 +79,34 @@ export class FluxTableElement extends HTMLElement {
      * @param {formatValue | null} format_value
      * @param {updateRow | null} update_row
      * @param {string | null} row_id_key
-     * @returns {FluxTableElement}
+     * @param {StyleSheetManager | null} style_sheet_manager
+     * @returns {Promise<FluxTableElement>}
      */
-    static new(format_value = null, update_row = null, row_id_key = null) {
+    static async new(format_value = null, update_row = null, row_id_key = null, style_sheet_manager = null) {
+        if (style_sheet_manager !== null) {
+            await style_sheet_manager.generateVariableStyleSheet(
+                this.name,
+                {
+                    [`${FLUX_TABLE_ELEMENT_VARIABLE_PREFIX}background-color`]: "background-color",
+                    [`${FLUX_TABLE_ELEMENT_VARIABLE_PREFIX}border-color`]: "foreground-color",
+                    [`${FLUX_TABLE_ELEMENT_VARIABLE_PREFIX}foreground-color`]: "foreground-color",
+                    [`${FLUX_TABLE_ELEMENT_VARIABLE_PREFIX}header-row-background-color`]: "accent-color",
+                    [`${FLUX_TABLE_ELEMENT_VARIABLE_PREFIX}header-row-border-color`]: "accent-color-foreground-color",
+                    [`${FLUX_TABLE_ELEMENT_VARIABLE_PREFIX}header-row-foreground-color`]: "accent-color-foreground-color"
+                },
+                true
+            );
+
+            await style_sheet_manager.addStyleSheet(
+                root_css,
+                true
+            );
+        } else {
+            if (!document.adoptedStyleSheets.includes(root_css)) {
+                document.adoptedStyleSheets.unshift(root_css);
+            }
+        }
+
         return new this(
             format_value ?? this.#defaultFormatValue,
             update_row,
@@ -153,9 +181,9 @@ export class FluxTableElement extends HTMLElement {
         }
         column_element.innerText = column.label;
 
-        this.#column_width_style_sheet.insertRule(`[data-column_key="${column.key}"] {--flux-table-column-width: var(--flux-table-column-${column.key}-width, auto)}`);
+        this.#column_width_style_sheet.insertRule(`[data-column_key="${column.key}"] {${FLUX_TABLE_ELEMENT_VARIABLE_PREFIX}column-width: var(${FLUX_TABLE_ELEMENT_VARIABLE_PREFIX}column-${column.key}-width, auto)}`);
         if ((column.width ?? "") !== "") {
-            this.style.setProperty(`--flux-table-column-${column.key}-width`, column.width);
+            this.style.setProperty(`${FLUX_TABLE_ELEMENT_VARIABLE_PREFIX}column-${column.key}-width`, column.width);
         }
 
         if (before_key !== null) {
@@ -305,7 +333,7 @@ export class FluxTableElement extends HTMLElement {
                 label: column_element.innerText,
                 "update-rows": (column_element.dataset.column_update_rows ?? "false") === "true",
                 type: column_element.dataset.column_type ?? null,
-                width: this.style.getPropertyValue(`--flux-table-column-${key}-width`)
+                width: this.style.getPropertyValue(`${FLUX_TABLE_ELEMENT_VARIABLE_PREFIX}column-${key}-width`)
             };
         });
     }
@@ -323,7 +351,7 @@ export class FluxTableElement extends HTMLElement {
             column_element.remove();
         });
 
-        this.style.removeProperty(`--flux-table-column-${key}-width`);
+        this.style.removeProperty(`${FLUX_TABLE_ELEMENT_VARIABLE_PREFIX}column-${key}-width`);
 
         const rules = Array.from(this.#column_width_style_sheet.cssRules);
         rules.filter(rule => rule.cssText.startsWith(`[data-column_key="${key}"]`)).forEach(rule => {
