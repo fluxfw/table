@@ -84,7 +84,7 @@ export class FluxTableElement extends HTMLElement {
      */
     static async new(format_value = null, update_row = null, row_id_key = null, style_sheet_manager = null) {
         if (style_sheet_manager !== null) {
-            await style_sheet_manager.generateVariableStyleSheet(
+            await style_sheet_manager.generateVariablesRootStyleSheet(
                 this.name,
                 {
                     [`${FLUX_TABLE_ELEMENT_VARIABLE_PREFIX}background-color`]: "background-color",
@@ -97,7 +97,7 @@ export class FluxTableElement extends HTMLElement {
                 true
             );
 
-            await style_sheet_manager.addStyleSheet(
+            await style_sheet_manager.addRootStyleSheet(
                 root_css,
                 true
             );
@@ -107,11 +107,36 @@ export class FluxTableElement extends HTMLElement {
             }
         }
 
-        return new this(
+        const flux_table_element = new this(
             format_value ?? this.#defaultFormatValue,
-            update_row,
-            row_id_key ?? ""
+            update_row
         );
+
+        flux_table_element.#shadow = flux_table_element.attachShadow({
+            mode: "closed"
+        });
+
+        await style_sheet_manager?.addStyleSheetsToShadow(
+            flux_table_element.#shadow
+        );
+
+        flux_table_element.#shadow.adoptedStyleSheets.push(css);
+
+        flux_table_element.#shadow.adoptedStyleSheets.push(flux_table_element.#column_width_style_sheet = new CSSStyleSheet());
+
+        const table_element = document.createElement("table");
+
+        const header_element = document.createElement("thead");
+        header_element.append(document.createElement("tr"));
+        table_element.append(header_element);
+
+        table_element.append(document.createElement("tbody"));
+
+        flux_table_element.#shadow.append(table_element);
+
+        flux_table_element.row_id_key = row_id_key ?? "";
+
+        return flux_table_element;
     }
 
     /**
@@ -125,33 +150,13 @@ export class FluxTableElement extends HTMLElement {
     /**
      * @param {formatValue} format_value
      * @param {updateRow | null} update_row
-     * @param {string} row_id_key
      * @private
      */
-    constructor(format_value, update_row, row_id_key) {
+    constructor(format_value, update_row) {
         super();
 
         this.#format_value = format_value;
         this.#update_row = update_row;
-
-        this.#shadow = this.attachShadow({
-            mode: "closed"
-        });
-
-        this.#shadow.adoptedStyleSheets.push(css);
-        this.#shadow.adoptedStyleSheets.push(this.#column_width_style_sheet = new CSSStyleSheet());
-
-        const table_element = document.createElement("table");
-
-        const header_element = document.createElement("thead");
-        header_element.append(document.createElement("tr"));
-        table_element.append(header_element);
-
-        table_element.append(document.createElement("tbody"));
-
-        this.#shadow.append(table_element);
-
-        this.row_id_key = row_id_key;
     }
 
     /**
