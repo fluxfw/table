@@ -85,7 +85,7 @@ export class FluxTableElement extends HTMLElement {
     static async new(format_value = null, update_row = null, row_id_key = null, style_sheet_manager = null) {
         if (style_sheet_manager !== null) {
             await style_sheet_manager.generateVariablesRootStyleSheet(
-                this.name,
+                FLUX_TABLE_ELEMENT_VARIABLE_PREFIX,
                 {
                     [`${FLUX_TABLE_ELEMENT_VARIABLE_PREFIX}background-color`]: "background-color",
                     [`${FLUX_TABLE_ELEMENT_VARIABLE_PREFIX}border-color`]: "foreground-color",
