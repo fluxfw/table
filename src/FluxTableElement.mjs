@@ -1,18 +1,11 @@
-import { flux_import_css } from "../../flux-style-sheet-manager/src/FluxImportCss.mjs";
+import css from "./FluxTableElement.css" with { type: "css" };
+import root_css from "./FluxTableElementRoot.css" with { type: "css" };
 
 /** @typedef {import("./Column.mjs").Column} Column */
 /** @typedef {import("./formatValue.mjs").formatValue} formatValue */
 /** @typedef {import("./Row.mjs").Row} Row */
 /** @typedef {import("./StyleSheetManager/StyleSheetManager.mjs").StyleSheetManager} StyleSheetManager */
 /** @typedef {import("./updateRow.mjs").updateRow} updateRow */
-
-const root_css = await flux_import_css.import(
-    `${import.meta.url.substring(0, import.meta.url.lastIndexOf("/"))}/FluxTableElementRoot.css`
-);
-
-const css = await flux_import_css.import(
-    `${import.meta.url.substring(0, import.meta.url.lastIndexOf("/"))}/FluxTableElement.css`
-);
 
 export const FLUX_TABLE_ELEMENT_VARIABLE_PREFIX = "--flux-table-";
 
