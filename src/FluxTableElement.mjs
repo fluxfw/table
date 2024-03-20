@@ -136,7 +136,7 @@ export class FluxTableElement extends HTMLElement {
      * @param {*} value
      * @returns {Promise<Node | string>}
      */
-    static #defaultFormatValue(value = null) {
+    static async #defaultFormatValue(value = null) {
         return value instanceof Node ? value : `${(value ?? "") !== "" ? value : "-"}`;
     }
 

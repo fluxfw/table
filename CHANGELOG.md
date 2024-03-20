@@ -6,6 +6,12 @@ Changes:
 
 \-
 
+## v2024-03-20-1
+
+Changes:
+
+- Fix wrong default format value return type
+
 ## v2024-01-15-1
 
 Changes:
