@@ -1,5 +1,5 @@
-import css from "./FluxTableElement.css" with { type: "css" };
-import root_css from "./FluxTableElementRoot.css" with { type: "css" };
+import css from "./TableElement.css" with { type: "css" };
+import root_css from "./TableElementRoot.css" with { type: "css" };
 
 /** @typedef {import("./Column.mjs").Column} Column */
 /** @typedef {import("./formatValue.mjs").formatValue} formatValue */
@@ -7,9 +7,9 @@ import root_css from "./FluxTableElementRoot.css" with { type: "css" };
 /** @typedef {import("./StyleSheetManager/StyleSheetManager.mjs").StyleSheetManager} StyleSheetManager */
 /** @typedef {import("./updateRow.mjs").updateRow} updateRow */
 
-export const FLUX_TABLE_ELEMENT_VARIABLE_PREFIX = "--flux-table-";
+export const TABLE_ELEMENT_VARIABLE_PREFIX = "--table-";
 
-export class FluxTableElement extends HTMLElement {
+export class TableElement extends HTMLElement {
     /**
      * @type {CSSStyleSheet}
      */
@@ -43,29 +43,29 @@ export class FluxTableElement extends HTMLElement {
      * @param {updateRow | null} update_row
      * @param {string | null} no_rows_label
      * @param {StyleSheetManager | null} style_sheet_manager
-     * @returns {Promise<FluxTableElement>}
+     * @returns {Promise<TableElement>}
      */
     static async newWithData(columns = null, row_id_key = null, rows = null, format_value = null, update_row = null, no_rows_label = null, style_sheet_manager = null) {
-        const flux_table_element = await this.new(
+        const table_element = await this.new(
             format_value,
             update_row,
             row_id_key ?? "",
             style_sheet_manager
         );
 
-        await flux_table_element.setColumns(
+        await table_element.setColumns(
             columns ?? [],
             false
         );
-        await flux_table_element.setRows(
+        await table_element.setRows(
             rows ?? [],
             false
         );
-        await flux_table_element.setNoRowsLabel(
+        await table_element.setNoRowsLabel(
             no_rows_label
         );
 
-        return flux_table_element;
+        return table_element;
     }
 
     /**
@@ -73,19 +73,19 @@ export class FluxTableElement extends HTMLElement {
      * @param {updateRow | null} update_row
      * @param {string | null} row_id_key
      * @param {StyleSheetManager | null} style_sheet_manager
-     * @returns {Promise<FluxTableElement>}
+     * @returns {Promise<TableElement>}
      */
     static async new(format_value = null, update_row = null, row_id_key = null, style_sheet_manager = null) {
         if (style_sheet_manager !== null) {
             await style_sheet_manager.generateVariablesRootStyleSheet(
-                FLUX_TABLE_ELEMENT_VARIABLE_PREFIX,
+                TABLE_ELEMENT_VARIABLE_PREFIX,
                 {
-                    [`${FLUX_TABLE_ELEMENT_VARIABLE_PREFIX}background-color`]: "background-color",
-                    [`${FLUX_TABLE_ELEMENT_VARIABLE_PREFIX}border-color`]: "foreground-color",
-                    [`${FLUX_TABLE_ELEMENT_VARIABLE_PREFIX}foreground-color`]: "foreground-color",
-                    [`${FLUX_TABLE_ELEMENT_VARIABLE_PREFIX}header-row-background-color`]: "accent-color",
-                    [`${FLUX_TABLE_ELEMENT_VARIABLE_PREFIX}header-row-border-color`]: "accent-color-foreground-color",
-                    [`${FLUX_TABLE_ELEMENT_VARIABLE_PREFIX}header-row-foreground-color`]: "accent-color-foreground-color"
+                    [`${TABLE_ELEMENT_VARIABLE_PREFIX}background-color`]: "background-color",
+                    [`${TABLE_ELEMENT_VARIABLE_PREFIX}border-color`]: "foreground-color",
+                    [`${TABLE_ELEMENT_VARIABLE_PREFIX}foreground-color`]: "foreground-color",
+                    [`${TABLE_ELEMENT_VARIABLE_PREFIX}header-row-background-color`]: "accent-color",
+                    [`${TABLE_ELEMENT_VARIABLE_PREFIX}header-row-border-color`]: "accent-foreground-color",
+                    [`${TABLE_ELEMENT_VARIABLE_PREFIX}header-row-foreground-color`]: "accent-foreground-color"
                 },
                 true
             );
@@ -100,36 +100,36 @@ export class FluxTableElement extends HTMLElement {
             }
         }
 
-        const flux_table_element = new this(
+        const table_element = new this(
             format_value ?? this.#defaultFormatValue,
             update_row
         );
 
-        flux_table_element.#shadow = flux_table_element.attachShadow({
+        table_element.#shadow = table_element.attachShadow({
             mode: "closed"
         });
 
         await style_sheet_manager?.addStyleSheetsToShadow(
-            flux_table_element.#shadow
+            table_element.#shadow
         );
 
-        flux_table_element.#shadow.adoptedStyleSheets.push(css);
+        table_element.#shadow.adoptedStyleSheets.push(css);
 
-        flux_table_element.#shadow.adoptedStyleSheets.push(flux_table_element.#column_width_style_sheet = new CSSStyleSheet());
+        table_element.#shadow.adoptedStyleSheets.push(table_element.#column_width_style_sheet = new CSSStyleSheet());
 
-        const table_element = document.createElement("table");
+        const _table_element = document.createElement("table");
 
         const header_element = document.createElement("thead");
         header_element.append(document.createElement("tr"));
-        table_element.append(header_element);
+        _table_element.append(header_element);
 
-        table_element.append(document.createElement("tbody"));
+        _table_element.append(document.createElement("tbody"));
 
-        flux_table_element.#shadow.append(table_element);
+        table_element.#shadow.append(_table_element);
 
-        flux_table_element.row_id_key = row_id_key ?? "";
+        table_element.row_id_key = row_id_key ?? "";
 
-        return flux_table_element;
+        return table_element;
     }
 
     /**
@@ -179,9 +179,9 @@ export class FluxTableElement extends HTMLElement {
         }
         column_element.innerText = column.label;
 
-        this.#column_width_style_sheet.insertRule(`[data-column_key="${column.key}"] {${FLUX_TABLE_ELEMENT_VARIABLE_PREFIX}column-width: var(${FLUX_TABLE_ELEMENT_VARIABLE_PREFIX}column-${column.key}-width, auto)}`);
+        this.#column_width_style_sheet.insertRule(`[data-column_key="${column.key}"] {${TABLE_ELEMENT_VARIABLE_PREFIX}column-width: var(${TABLE_ELEMENT_VARIABLE_PREFIX}column-${column.key}-width, auto)}`);
         if ((column.width ?? "") !== "") {
-            this.style.setProperty(`${FLUX_TABLE_ELEMENT_VARIABLE_PREFIX}column-${column.key}-width`, column.width);
+            this.style.setProperty(`${TABLE_ELEMENT_VARIABLE_PREFIX}column-${column.key}-width`, column.width);
         }
 
         if (before_key !== null) {
@@ -331,7 +331,7 @@ export class FluxTableElement extends HTMLElement {
                 label: column_element.innerText,
                 "update-rows": (column_element.dataset.column_update_rows ?? "false") === "true",
                 type: column_element.dataset.column_type ?? null,
-                width: this.style.getPropertyValue(`${FLUX_TABLE_ELEMENT_VARIABLE_PREFIX}column-${key}-width`)
+                width: this.style.getPropertyValue(`${TABLE_ELEMENT_VARIABLE_PREFIX}column-${key}-width`)
             };
         });
     }
@@ -349,7 +349,7 @@ export class FluxTableElement extends HTMLElement {
             column_element.remove();
         });
 
-        this.style.removeProperty(`${FLUX_TABLE_ELEMENT_VARIABLE_PREFIX}column-${key}-width`);
+        this.style.removeProperty(`${TABLE_ELEMENT_VARIABLE_PREFIX}column-${key}-width`);
 
         const rules = Array.from(this.#column_width_style_sheet.cssRules);
         rules.filter(rule => rule.cssText.startsWith(`[data-column_key="${key}"]`)).forEach(rule => {
@@ -896,6 +896,6 @@ export class FluxTableElement extends HTMLElement {
     }
 }
 
-export const FLUX_TABLE_ELEMENT_TAG_NAME = "flux-table";
+export const TABLE_ELEMENT_TAG_NAME = "table";
 
-customElements.define(FLUX_TABLE_ELEMENT_TAG_NAME, FluxTableElement);
+customElements.define(TABLE_ELEMENT_TAG_NAME, TableElement);

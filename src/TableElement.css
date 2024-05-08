@@ -1,0 +1,76 @@
+:host {
+    background-color: var(--table-background-color);
+    display: block;
+    height: auto;
+    max-width: 100%;
+    width: 100%;
+}
+
+table {
+    height: auto;
+    width: 100%;
+}
+
+table, thead, tbody, tfoot, tr, th, td {
+    border: var(--table-border-width) var(--table-border-style) var(--table-border-color);
+    border-collapse: collapse;
+}
+
+th, td {
+    --table-column-width: auto;
+    width: var(--table-column-width);
+}
+
+th {
+    background-color: var(--table-header-row-background-color);
+    border-right: none;
+    color: var(--table-header-row-foreground-color);
+    font-size: var(--table-header-row-font-size);
+    font-weight: var(--table-header-row-font-weight);
+    padding: var(--table-header-row-padding);
+    text-align: var(--table-header-row-text-align);
+    vertical-align: var(--table-header-row-vertical-align);
+}
+
+th:not(:first-child) {
+    border-left: var(--table-header-row-border-width) var(--table-header-row-border-style) var(--table-header-row-border-color);
+}
+
+tr:nth-child(even) td {
+    background-color: var(--table-even-row-background-color);
+    color: var(--table-even-row-foreground-color);
+    font-size: var(--table-even-row-font-size);
+    font-weight: var(--table-even-row-font-weight);
+    padding: var(--table-even-row-padding);
+    text-align: var(--table-even-row-text-align);
+    vertical-align: var(--table-even-row-vertical-align);
+}
+
+tr:nth-child(even) td:not(:last-child) {
+    border-right: var(--table-even-row-border-width) var(--table-even-row-border-style) var(--table-even-row-border-color);
+}
+
+tr:nth-child(odd) td {
+    background-color: var(--table-odd-row-background-color);
+    color: var(--table-odd-row-foreground-color);
+    font-size: var(--table-odd-row-font-size);
+    font-weight: var(--table-odd-row-font-weight);
+    padding: var(--table-odd-row-padding);
+    text-align: var(--table-odd-row-text-align);
+    vertical-align: var(--table-odd-row-vertical-align);
+}
+
+tr:nth-child(odd) td:not(:last-child) {
+    border-right: var(--table-odd-row-border-width) var(--table-odd-row-border-style) var(--table-odd-row-border-color);
+}
+
+tr td[colspan] {
+    background-color: var(--table-no-rows-row-background-color);
+    color: var(--table-no-rows-row-foreground-color);
+    font-size: var(--table-no-rows-row-font-size);
+    font-weight: var(--table-no-rows-row-font-weight);
+    padding: var(--table-no-rows-row-padding);
+    text-align: var(--table-no-rows-row-text-align);
+    vertical-align: var(--table-no-rows-row-vertical-align);
+    width: auto;
+}

@@ -1,3 +1,1 @@
-# flux-table
-
-Table
+# table
