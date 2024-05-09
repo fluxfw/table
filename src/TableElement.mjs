@@ -896,6 +896,6 @@ export class TableElement extends HTMLElement {
     }
 }
 
-export const TABLE_ELEMENT_TAG_NAME = "table";
+export const TABLE_ELEMENT_TAG_NAME = "table-table";
 
 customElements.define(TABLE_ELEMENT_TAG_NAME, TableElement);

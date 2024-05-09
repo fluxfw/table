@@ -6,6 +6,12 @@ Changes:
 
 \-
 
+## v2024-05-09-1
+
+Changes:
+
+- Fix invalid tag name
+
 ## v2024-05-08-1
 
 Changes:
