@@ -1,6 +1,8 @@
 :host {
     background-color: var(--table-background-color);
+    color: var(--table-foreground-color);
     display: block;
+    font-size: var(--table-font-size);
     height: auto;
     max-width: 100%;
     width: 100%;
