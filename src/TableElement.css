@@ -3,6 +3,8 @@
     color: var(--table-foreground-color);
     display: block;
     font-size: var(--table-font-size);
+    font-style: var(--table-font-style);
+    font-weight: var(--table-font-weight);
     height: auto;
     max-width: 100%;
     width: 100%;
@@ -28,6 +30,7 @@ th {
     border-right: none;
     color: var(--table-header-row-foreground-color);
     font-size: var(--table-header-row-font-size);
+    font-style: var(--table-header-row-font-style);
     font-weight: var(--table-header-row-font-weight);
     padding: var(--table-header-row-padding);
     text-align: var(--table-header-row-text-align);
@@ -42,6 +45,7 @@ tr:nth-child(even) td {
     background-color: var(--table-even-row-background-color);
     color: var(--table-even-row-foreground-color);
     font-size: var(--table-even-row-font-size);
+    font-style: var(--table-even-row-font-style);
     font-weight: var(--table-even-row-font-weight);
     padding: var(--table-even-row-padding);
     text-align: var(--table-even-row-text-align);
@@ -56,6 +60,7 @@ tr:nth-child(odd) td {
     background-color: var(--table-odd-row-background-color);
     color: var(--table-odd-row-foreground-color);
     font-size: var(--table-odd-row-font-size);
+    font-style: var(--table-odd-row-font-style);
     font-weight: var(--table-odd-row-font-weight);
     padding: var(--table-odd-row-padding);
     text-align: var(--table-odd-row-text-align);
@@ -70,6 +75,7 @@ tr td[colspan] {
     background-color: var(--table-no-rows-row-background-color);
     color: var(--table-no-rows-row-foreground-color);
     font-size: var(--table-no-rows-row-font-size);
+    font-style: var(--table-no-rows-row-font-style);
     font-weight: var(--table-no-rows-row-font-weight);
     padding: var(--table-no-rows-row-padding);
     text-align: var(--table-no-rows-row-text-align);

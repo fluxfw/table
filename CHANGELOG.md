@@ -6,6 +6,12 @@ Changes:
 
 \-
 
+## v2024-05-14-1
+
+Changes:
+
+- Font style variable
+
 ## v2024-05-13-1
 
 Changes:

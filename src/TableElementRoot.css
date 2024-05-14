@@ -8,12 +8,14 @@
     --table-even-row-border-style: var(--table-border-style);
     --table-even-row-border-width: var(--table-border-width);
     --table-even-row-font-size: var(--table-font-size);
+    --table-even-row-font-style: var(--table-font-style);
     --table-even-row-font-weight: var(--table-font-weight);
     --table-even-row-foreground-color: var(--table-foreground-color);
     --table-even-row-padding: var(--table-padding);
     --table-even-row-text-align: var(--table-text-align);
     --table-even-row-vertical-align: var(--table-vertical-align);
     --table-font-size: 16px;
+    --table-font-style: normal;
     --table-font-weight: normal;
     --table-foreground-color: #000000;
     --table-header-row-background-color: #000000;
@@ -21,6 +23,7 @@
     --table-header-row-border-style: var(--table-border-style);
     --table-header-row-border-width: var(--table-border-width);
     --table-header-row-font-size: var(--table-font-size);
+    --table-header-row-font-style: var(--table-font-style);
     --table-header-row-font-weight: bold;
     --table-header-row-foreground-color: #ffffff;
     --table-header-row-padding: var(--table-padding);
@@ -28,6 +31,7 @@
     --table-header-row-vertical-align: var(--table-vertical-align);
     --table-no-rows-row-background-color: var(--table-background-color);
     --table-no-rows-row-font-size: var(--table-font-size);
+    --table-no-rows-row-font-style: var(--table-font-style);
     --table-no-rows-row-font-weight: var(--table-font-weight);
     --table-no-rows-row-foreground-color: var(--table-foreground-color);
     --table-no-rows-row-padding: var(--table-padding);
@@ -38,6 +42,7 @@
     --table-odd-row-border-style: var(--table-border-style);
     --table-odd-row-border-width: var(--table-border-width);
     --table-odd-row-font-size: var(--table-font-size);
+    --table-odd-row-font-style: var(--table-font-style);
     --table-odd-row-font-weight: var(--table-font-weight);
     --table-odd-row-foreground-color: var(--table-foreground-color);
     --table-odd-row-padding: var(--table-padding);
